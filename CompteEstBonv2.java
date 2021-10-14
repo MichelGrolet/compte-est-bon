@@ -4,13 +4,13 @@ import java.util.*;
  * Solveur du "compte est bon".
  * @author Michel Grolet & Antoine Chevaleyre
  */
-public class CompteEstBon {
+public class CompteEstBonv2 {
 	private static boolean compteEstBon = false;
 	private static final ArrayList<Character> OPERATIONS = new ArrayList<>(Arrays.asList('+', '*', '-', '/'));
 	private static ArrayList<String> calculsEffectues = new ArrayList<String>();
-	private static ArrayList<String> calculsMoinsBon = new ArrayList<String>();
-	private static ArrayList<String> calculsMoinsBonCour = new ArrayList<String>();
-	private static int nbAttendu, nbProche = 0, nbProcheCour = 0, nbIterations = 1;
+	private static String[] calculsMoinsBon = new String[5];
+	private static String[] calculsMoinsBonCour = new String[5];
+	private static int nbAttendu, nbProche = 0, nbIterations = 1;
 
 	public static void main(String[] args) {
 		if (args.length!=7) {
@@ -32,52 +32,72 @@ public class CompteEstBon {
 	 * @return true si le compte est bon.
 	 */
 	public static boolean calculerCompteEstBon(ArrayList<Integer> valeurs) {
-		Collections.sort(valeurs);
+		if (valeurs.size()>=2) {
+		
 		nbIterations++;
-		compteEstBon = false;
+		
+		// Copie de la liste des valeurs qu'on va trier
+		//ArrayList<Integer> valeurs = new ArrayList<Integer>(valeursPrec);
+		Collections.sort(valeurs, Collections.reverseOrder());
+		
+		// System.out.println("\n[etage : "+etage+"] Ite : "+valeurs);
+
+		// Liste des couples qu'on peut generer avec les valeurs
 		ArrayList<ArrayList<Integer>> couples = calculerCouples(valeurs);
+		// System.out.println("couples : "+couples);
+
 		// Parcours des couples
-		for (int iCouple = 0; iCouple < couples.size()-1 && !compteEstBon; iCouple++) {
+		for (int iCouple = 0; iCouple < couples.size() && !compteEstBon && valeurs.size()>=2; iCouple++) {
+			// System.out.println("\t couple : "+couples.get(iCouple));
 			// Parcours des 4 operations
-			for (int iOperation = 0; iOperation < 4 && !compteEstBon; iOperation++) {
+			for (int iOperation = 0; iOperation < 4 && !compteEstBon && valeurs.size()>=2; iOperation++) {
 				int a = couples.get(iCouple).get(0);
 				int b = couples.get(iCouple).get(1);
 				int resultat = calculer(a, b, OPERATIONS.get(iOperation));
 				String calcul = a+""+OPERATIONS.get(iOperation)+""+b+" = "+resultat;
-				if (resultat<0 || resultat!=nbAttendu || valeurs.size()==1) {
-					if (Math.abs(resultat-nbProcheCour)<=Math.abs(resultat-nbProche)) {
-						nbProche = nbProcheCour;
-						calculsMoinsBon.clear();
-						calculsMoinsBon.addAll(calculsMoinsBonCour);
-					}
-					nbProcheCour = 0;
-					calculsMoinsBonCour.clear();
-				}
-				if (resultat>=0) {
+				// System.out.println("\t\t operation : "+calcul+" "+valeurs);
+				// calculer() retourne -1 si le calcul n'est pas necesasire.
+				// On passe donc les resultats negatifs.
+				if (resultat>0 && valeurs.size()>=2) {
+					calculsMoinsBonCour[6-valeurs.size()] = calcul;
+					// System.out.println("\t\t\t calcul utile !");
 					// Modifie le nbProche si resultat est plus proche du resultat attendu. 
 					// ne fait le set que dans la derniere case (il faudrait pouvoir set les auteres cases)
-					if (Math.abs(resultat-nbAttendu)<=Math.abs(nbProche-nbAttendu)) {
-						nbProcheCour = resultat;
-						calculsMoinsBonCour.add(6-valeurs.size(), calcul+" "+nbIterations);
-						System.out.println("add (pos "+(6-valeurs.size())+" - taille tab : "+calculsMoinsBon.size()+")");
+					if (Math.abs(resultat-nbAttendu)<Math.abs(nbProche-nbAttendu)) {
+						// System.out.println("\t\t\t on s'approche du resultat "+resultat+"). calculs : ("+valeurs);
+						nbProche = resultat;
+						for (int i = 0; i <= 6-valeurs.size(); i++) {
+							calculsMoinsBon[i] = calculsMoinsBonCour[i];
+							// System.out.println("\t\t\t\t "+calculsMoinsBon[i]);
+						}
+						for (int i = 7-valeurs.size(); i < 5; i++) {
+							calculsMoinsBon[i] = calculsMoinsBonCour[i];
+						}
+						// calculsMoinsBon = new String[5];
+						// calculsMoinsBon = calculsMoinsBonCour;
 					}
 					if (resultat==nbAttendu) {
 						calculsEffectues.add(0, calcul);
+						System.out.println("COMPTE EST BON YEAAAAAAAH");
 						return true;
 					} else {
+						// System.out.println(valeurs.size()+" "+valeurs+" "+couples+" "+calcul);
 						ArrayList<Integer> nouvValeurs = new ArrayList<>(valeurs);
 						nouvValeurs.remove(nouvValeurs.indexOf(a));
 						nouvValeurs.remove(nouvValeurs.indexOf(b));
 						nouvValeurs.add(resultat);
 						// Appel recursif :
+						// System.out.println("Appel recursif [vers etage "+etage+"]");
 						compteEstBon = calculerCompteEstBon(nouvValeurs);
 						if (compteEstBon) {
 							calculsEffectues.add(0, calcul);
 						}
-					}	
+					}
 				}
 			}
 		}
+		}
+		// System.out.println("retour vers etage "+etage);
 		return compteEstBon;
 	}
 
@@ -110,16 +130,17 @@ public class CompteEstBon {
 				calc=a+b;
 				break;
 			case '-':
-				calc=Math.max(a-b, b-a);
+				// on fait a-b car comme la liste est triée a>b
+				if (a-b!=0) {
+					calc=a-b;
+				}
 				break;
 			case '*':
-				if(!(a==1||b==1)) calc=a*b;
+				if(!(a==0 && b==0 && a==1 && a==1)) calc=a*b;
 				break;
 			case '/':
-				if(!(a==1||b==1)&&a>0&&b>0) {
-					if (a%b==0) calc=a/b;
-					else if (b%a==0) calc=b/a;
-				}
+				if(!(a==0 && b==0 && a==1 && a==1) && a%b==0)
+					calc=a/b;
 				break;
 			default:
 				break;
@@ -138,7 +159,7 @@ public class CompteEstBon {
 				System.out.println(calcul);
 		}
 		else {
-			System.out.println("Pas de solution exacte. \nLa valeur la plus proche est : "+nbProche);
+			System.out.println("Pas de solution exacte. \nLa valeur la plus proche est : "+nbProche+". nbIt="+nbIterations);
 			System.out.println("Calcul :");
 			for (String calcul : calculsMoinsBon)
 				System.out.println(calcul);
