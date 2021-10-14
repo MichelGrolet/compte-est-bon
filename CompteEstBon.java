@@ -1,19 +1,16 @@
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
+import java.util.*;
 
 /**
  * Solveur du "compte est bon".
  * @author Michel Grolet & Antoine Chevaleyre
- * @version 1.0
  */
 public class CompteEstBon {
 	private static boolean compteEstBon = false;
 	private static final ArrayList<Character> OPERATIONS = new ArrayList<>(Arrays.asList('+', '*', '-', '/'));
-	private static int nbAttendu;
-	private static ArrayList<String> calculsEffectues = new ArrayList<>();
-	private static int nbProche = 0;
-	private static int nbIterations = 1;
+	private static ArrayList<String> calculsEffectues = new ArrayList<String>();
+	private static ArrayList<String> calculsMoinsBon = new ArrayList<String>();
+	private static ArrayList<String> calculsMoinsBonCour = new ArrayList<String>();
+	private static int nbAttendu, nbProche = 0, nbProcheCour = 0, nbIterations = 1;
 
 	public static void main(String[] args) {
 		if (args.length!=7) {
@@ -47,7 +44,23 @@ public class CompteEstBon {
 				int b = couples.get(iCouple).get(1);
 				int resultat = calculer(a, b, OPERATIONS.get(iOperation));
 				String calcul = a+""+OPERATIONS.get(iOperation)+""+b+" = "+resultat;
+				if (resultat<0 || resultat!=nbAttendu || valeurs.size()==1) {
+					if (Math.abs(resultat-nbProcheCour)<=Math.abs(resultat-nbProche)) {
+						nbProche = nbProcheCour;
+						calculsMoinsBon.clear();
+						calculsMoinsBon.addAll(calculsMoinsBonCour);
+					}
+					nbProcheCour = 0;
+					calculsMoinsBonCour.clear();
+				}
 				if (resultat>=0) {
+					// Modifie le nbProche si resultat est plus proche du resultat attendu. 
+					// ne fait le set que dans la derniere case (il faudrait pouvoir set les auteres cases)
+					if (Math.abs(resultat-nbAttendu)<=Math.abs(nbProche-nbAttendu)) {
+						nbProcheCour = resultat;
+						calculsMoinsBonCour.add(6-valeurs.size(), calcul+" "+nbIterations);
+						System.out.println("add (pos "+(6-valeurs.size())+" - taille tab : "+calculsMoinsBon.size()+")");
+					}
 					if (resultat==nbAttendu) {
 						calculsEffectues.add(0, calcul);
 						return true;
@@ -119,10 +132,16 @@ public class CompteEstBon {
 	 * @param resultat resultat de l'execution de calculerCompteEstBon().
 	 */
 	private static void afficherResultat(boolean resultat) {
-		if (resultat) System.out.println("Le compte est bon!! nbIt="+nbIterations);
-		else System.out.println("Pas de solution exacte. \nLa valeur la plus proche est : "+nbProche);
-		System.out.println("Calcul :");
-		for (String calcul : calculsEffectues)
-			System.out.println(calcul);
+		if (resultat) {
+			System.out.println("Le compte est bon!! nbIt="+nbIterations);
+			for (String calcul : calculsEffectues)
+				System.out.println(calcul);
+		}
+		else {
+			System.out.println("Pas de solution exacte. \nLa valeur la plus proche est : "+nbProche);
+			System.out.println("Calcul :");
+			for (String calcul : calculsMoinsBon)
+				System.out.println(calcul);
+		}
 	}
 }
