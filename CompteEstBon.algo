@@ -1,0 +1,76 @@
+fonction main(tableau(chaine) args)
+début
+	resultat <- calculerCompteEstBon(genererNombres(args))
+	afficherResultat(resultat)
+fin
+
+fonction genererNombres(tableau(chaine) args) : liste(entier)
+début
+	nbAttendu <- args[6]
+fin
+
+nbProche <- 0
+compteEstBon <- faux
+
+fonction calculerCompteEstBon(liste(entier) valeurs) : booléen
+début
+	triOrdreInverse(valeurs)
+	couples <- calculerCouples(valeurs)
+	pour iCouple de 0 à taille(couples)-1 et non(compteEstBon) faire
+		pour iOperation de 0 à 3 et non(compteEstBon) faire
+			a <- val(val(couples, iCouple), 0)
+			a <- val(val(couples, iCouple), 1)
+			resultat <- calculer(a, b, OPERATIONS[iOperation])
+			si resultat>0 alors
+				calcul <- concat(a, OPERATIONS[iOperation], b, " = ", resultat)
+				calculsMoinsBonCour[6-taille(valeurs)] <- calcul
+				si absolu(resultat-nbAttendu) < absolu(nbProche-nbAttendu) alors
+					nbProche <- resultat
+					calculsMoinsBon <- calculsMoinsBonCour
+				fsi
+				si resultat = nbAttendu alors
+					adjtlis(calculsEffectues, calcul)
+					retourne vrai
+				sinon
+					si taille(valeurs>2) alors
+						nouvValeurs <- valeurs
+						suplis(nouvValeurs, place(nouvValeurs, a))
+						suplis(nouvValeurs, place(nouvValeurs, b))
+						adjtlis(nouvValeurs, resultat)
+						compteEstBon <- calculerCompteEstBon(nouvValeurs)
+						si compteEstBon alors
+							adjtlis(calculsEffectues, calcul)
+						fsi
+					fsi
+				fsi
+			fsi
+		fpour
+	fpour
+	retourne compteEstBon
+fin
+lexique
+	nom : type "description"
+
+fonction calculerCouples(liste(entier) valeurs) : liste(liste(entier))
+début
+	pour a de 0 à taille(valeurs)-1 faire
+		pour b de taille(valeurs)-1 à b>a faire
+			si non(a=b) ou non(a=0) ou non(b=0) alors
+				subLis <- lisVide()
+				adjqlis(subLis, a)
+				adjqlis(subLis, b)
+				adjqlis(couples, subLis)
+			fsi
+		fpour
+	fpour
+	retourne couples
+fin
+lexique
+	couples : liste(liste(entier)) "couples créés à partir des valeurs"
+	subLis : liste(entier) "un couple de valeurs"
+
+fonction calcuer(parametres) : typeretour
+début
+	calc <- -1
+	
+fin

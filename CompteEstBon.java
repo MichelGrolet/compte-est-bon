@@ -12,7 +12,7 @@ public class CompteEstBon {
 	private static ArrayList<String> calculsEffectues = new ArrayList<String>();
 	private static String[] calculsMoinsBon = new String[5];
 	private static String[] calculsMoinsBonCour = new String[5];
-	private static int nbAttendu, nbProche = 0, nbIterations = 1;
+	private static int nbAttendu, nbProche = 0, nbIterations = 0;
 
 	/**
 	 * Lance l'algorithme puis affiche le resultat.
@@ -65,9 +65,9 @@ public class CompteEstBon {
 				int a = couples.get(iCouple).get(0);
 				int b = couples.get(iCouple).get(1);
 				int resultat = calculer(a, b, OPERATIONS[iOperation]);
-				String calcul = a+""+OPERATIONS[iOperation]+""+b+" = "+resultat;
 				// calculer() retourne -1 si le calcul n'est pas necessaire.
 				if (resultat>0) {
+					String calcul = a+""+OPERATIONS[iOperation]+""+b+" = "+resultat;
 					calculsMoinsBonCour[6-valeurs.size()] = calcul;
 					// Modifie le nbProche si resultat est plus proche du resultat attendu.
 					if (Math.abs(resultat-nbAttendu)<Math.abs(nbProche-nbAttendu)) {
