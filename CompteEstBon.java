@@ -5,15 +5,22 @@ import java.util.*;
  * @author Michel Grolet & Antoine Chevaleyre
  */
 public class CompteEstBon {
-	private static boolean compteEstBon = false;
 	private static final char[] OPERATIONS = new char[]{'+', '-', '*', '/'};
 	private static final ArrayList<Integer> NOMBRES_AUTORISES = new ArrayList<Integer>(Arrays.asList(1,2,3,4,5,6,7,8,9,10,25,50,75,100));
 
+	// Indique si le compte est bon
+	private static boolean compteEstBon = false;
+
+	// Contient les calculs menant au compte est bon
 	private static ArrayList<String> calculsEffectues = new ArrayList<String>();
+
+	// Contient les calculs menant au nombre le plus proche si le compte n'est pas bon
 	private static String[] calculsMoinsBon = new String[5];
 	private static String[] calculsMoinsBonCour = new String[5];
-	private static int nbAttendu, nbProche = 0, nbIterations = 0;
 
+	// Nombre attendu et nombre le plus proche du nombre attendu.
+	private static int nbAttendu, nbProche = 0;
+ 
 	/**
 	 * Lance l'algorithme puis affiche le resultat.
 	 * @param args 
@@ -51,7 +58,6 @@ public class CompteEstBon {
 	 * @return true si le compte est bon.
 	 */
 	public static boolean calculerCompteEstBon(ArrayList<Integer> valeurs) {
-		nbIterations++;
 		// Copie de la liste des valeurs qu'on va trier
 		Collections.sort(valeurs, Collections.reverseOrder());
 		
@@ -83,6 +89,7 @@ public class CompteEstBon {
 						nouvValeurs.remove(nouvValeurs.indexOf(a));
 						nouvValeurs.remove(nouvValeurs.indexOf(b));
 						nouvValeurs.add(resultat);
+						// Appel recursif :
 						compteEstBon = calculerCompteEstBon(nouvValeurs);
 						if (compteEstBon) calculsEffectues.add(0, calcul);
 					}
@@ -121,7 +128,7 @@ public class CompteEstBon {
 				calc=a+b;
 				break;
 			case '-':
-				// on fait a-b car comme la liste est triée, a>b
+				// on fait a-b (et pas b-a) car comme la liste est triée, a>b
 				calc=a-b;
 				break;
 			case '*':
@@ -138,17 +145,15 @@ public class CompteEstBon {
 	
 	/**
 	 * affiche les calculs du compte bon ou la valeur la plus proche obtenue.
-	 * @param resultat resultat de l'execution de calculerCompteEstBon().
+	 * @param compteEstBon resultat de l'execution de calculerCompteEstBon().
 	 */
-	private static void afficherResultat(boolean resultat) {
-		if (resultat) {
-			System.out.println("Le compte est bon!! nbIt="+nbIterations);
+	private static void afficherResultat(boolean compteEstBon) {
+		if (compteEstBon) {
+			System.out.println("Le compte est bon!!\nCalcul :");
 			for (String calcul : calculsEffectues)
 				System.out.println(calcul);
-		}
-		else {
-			System.out.println("Pas de solution exacte. \nLa valeur la plus proche est : "+nbProche+". nbIt="+nbIterations);
-			System.out.println("Calcul :");
+		} else {
+			System.out.println("Pas de solution exacte. \nLa valeur la plus proche est : "+nbProche+"\nCalcul :");
 			for (String calcul : calculsMoinsBon)
 				System.out.println(calcul);
 		}

@@ -1,7 +1,13 @@
 # Le compte est Bon
 
+Par Michel Grolet et Antoine Chevaleyre.
+
 - [Le compte est Bon](#le-compte-est-bon)
 	- [Fonctionnement global de l'algorithme](#fonctionnement-global-de-lalgorithme)
+	- [Optimisation du nombre d'itérations](#optimisation-du-nombre-ditérations)
+			- [Comment obtenir moins de couples](#comment-obtenir-moins-de-couples)
+			- [Comment passer certaines opérations](#comment-passer-certaines-opérations)
+			- [Enlever l'appel récursif si on n'a plus que 3 nombres](#enlever-lappel-récursif-si-on-na-plus-que-3-nombres)
 	- [Détail des fonctions](#détail-des-fonctions)
 			- [main](#main)
 			- [genererNombres](#generernombres)
@@ -16,7 +22,25 @@ La fonction principale de `CompteEstBon.java`, à savoir `calculerCompteEstBon()
 
 La fonction `genererNombres(args)` vérifie que les arguments passés à CompteEstBon sont valides. Si c'est le cas, elle met le nombre attendu dans un entier et retourne les 6 nombres de départ sous forme de liste.
 
-## Détail des fonctions 
+## Optimisation du nombre d'itérations
+
+Plusieurs ajouts dans `calculerCompteEstBon()`, `calculerCouples()` et `calculer()` ont permi de réduire drastiquement le nombre d'itérations.
+
+#### Comment obtenir moins de couples
+
+Il faut déjà penser aux deux `for` de `calculerCouples()`. Si on les agence bien et qu'on retire les couples où `a=b`, on tombe a (2 parmi (nombre de valeurs)) couples (soit 15 couples au début, puis 10 couples, ...)
+
+On peut retirer de ces couples ceux où a ou b sont nuls, car ils n'apportent rien à l'algorithme (les opérations avec un membre nul sont inutiles).
+
+#### Comment passer certaines opérations
+
+On n'a pas besoin de faire `a*b` et `a/b` si a ou b sont nuls ou égaux à 1. On doit aussi retirer les divisions `b/a` car la liste est triée dans l'ordre décroissant et donc le résultat ne serait pas un entier.
+
+#### Enlever l'appel récursif si on n'a plus que 3 nombres
+
+Si on n'a que 3 valeurs, il n'est plus utile de faire un appel récursif.
+
+## Détail des fonctions
 
 #### main
 
@@ -55,3 +79,4 @@ Elle retourne l'opération ou -1 si l'opération ne fait pas avancer l'algorithm
 
 #### afficherResultat
 
+Affiche le résultat du Compte est bon, et la liste des calculs menant au bon compte ou à la valeur la plus proche. 
