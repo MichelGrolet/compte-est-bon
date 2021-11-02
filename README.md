@@ -1,6 +1,6 @@
 # Le compte est Bon
 
-Par Michel Grolet et Antoine Chevaleyre.
+Résolution du jeu télévisé "Le compte est bon" en Java.
 
 - [Le compte est Bon](#le-compte-est-bon)
 	- [Fonctionnement global de l'algorithme](#fonctionnement-global-de-lalgorithme)
